@@ -8,6 +8,7 @@ import {
 import { HomeIcon, MenuIcon, UsersIcon, XIcon } from "lucide-vue-next";
 import SidebarLogo from "./SidebarLogo.vue";
 import SidebarNav from "./SidebarNav.vue";
+import NavUser from "./NavUser.vue";
 
 defineProps<{
   open: boolean;
@@ -25,12 +26,6 @@ const navigation = [
     to: { name: "portfolio" },
     icon: UsersIcon,
   },
-];
-
-const teams = [
-  { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
-  { id: 2, name: "Tailwind Labs", href: "#", initial: "T", current: false },
-  { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
 ];
 </script>
 
@@ -89,7 +84,7 @@ const teams = [
               class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-2 dark:bg-gray-900 dark:ring dark:ring-white/10 dark:before:pointer-events-none dark:before:absolute dark:before:inset-0 dark:before:bg-black/10"
             >
               <SidebarLogo />
-              <SidebarNav :navigation="navigation" :teams="teams" />
+              <SidebarNav :navigation="navigation" />
             </div>
           </DialogPanel>
         </TransitionChild>
@@ -99,17 +94,15 @@ const teams = [
 
   <!-- Desktop static sidebar -->
   <div
-    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col dark:bg-gray-900"
+    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-white/10"
   >
-    <div
-      class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 dark:border-white/10 dark:bg-black/10"
-    >
+    <div class="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
       <SidebarLogo />
-      <SidebarNav
-        :navigation="navigation"
-        :teams="teams"
-        :show-profile="true"
-      />
+      <SidebarNav :navigation="navigation" />
+    </div>
+
+    <div class="mt-auto p-4">
+      <NavUser />
     </div>
   </div>
 

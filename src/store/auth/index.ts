@@ -29,6 +29,9 @@ export const useAuthStore = defineStore("auth", () => {
       );
 
       accessToken.value = response.data.access_token;
+
+      await fetchAuthUser();
+
       return response.data;
     } catch (err) {
       const axiosError = err as AxiosError;
@@ -58,6 +61,21 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const logout = async () => {
+    isLoading.value = true;
+
+    try {
+      await axiosInstance.post("v1/auth/logout");
+    } catch (err) {
+      const axiosError = err as AxiosError;
+      error.value = `Server logout failed, clearing local memory anyway. ${axiosError.message}`;
+    } finally {
+      accessToken.value = null;
+      authUser.value = null;
+      isLoading.value = false;
+    }
+  };
+
   return {
     error,
     authUser,
@@ -65,6 +83,7 @@ export const useAuthStore = defineStore("auth", () => {
     accessToken,
 
     login,
+    logout,
     fetchAuthUser,
   };
 });
