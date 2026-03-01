@@ -5,9 +5,11 @@ import { useAuthStore, type LoginDto } from "@/store";
 import { ref } from "vue";
 import { useToast } from "@/composables/useToast";
 import type { AxiosError } from "axios";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
 const toast = useToast();
+const router = useRouter();
 
 const errorMessage = ref<string | null>(null);
 
@@ -20,46 +22,42 @@ const loginForm = ref<LoginDto>({
   password: "",
 });
 
-const resetForm = () => {
+const handleLogin = async () => {
   formValidationErrors.value = {
     username: "",
   };
+  errorMessage.value = null;
 
-  loginForm.value = {
-    username: "",
-    password: "",
-  };
-};
+  try {
+    await authStore.login(loginForm.value);
 
-const handleLogin = async () => {
-  await authStore
-    .login(loginForm.value)
-    .then(() => {
-      toast.notify({
-        type: "success",
-        title: "Successfully logged in!",
-        duration: 3000,
-      });
-      resetForm();
-    })
-    .catch((err) => {
-      const axiosError = err as AxiosError<any>;
-      if (axiosError.response?.data.errors) {
-        const errors = axiosError.response.data.errors;
-
-        formValidationErrors.value = {
-          username: errors.username?.[0] || "",
-        };
-      } else {
-        errorMessage.value = axiosError.message;
-        toast.notify({
-          type: "error",
-          title: "Something went wrong!",
-          message: errorMessage.value,
-          duration: 4000,
-        });
-      }
+    toast.notify({
+      type: "success",
+      title: "Successfully logged in!",
+      duration: 3000,
     });
+
+    router.push({
+      name: "home",
+    });
+  } catch (err) {
+    const axiosError = err as AxiosError<any>;
+
+    if (axiosError.response?.data.errors) {
+      const errors = axiosError.response.data.errors;
+      formValidationErrors.value = {
+        username: errors.username?.[0] || "",
+      };
+    } else {
+      errorMessage.value = axiosError.message || "An error occurred.";
+      toast.notify({
+        type: "error",
+        title: "Login failed",
+        message: errorMessage.value,
+        duration: 4000,
+      });
+    }
+  }
 };
 </script>
 
@@ -111,7 +109,6 @@ const handleLogin = async () => {
               type="password"
               name="password"
               id="password"
-              autocomplete="current-password"
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
             />
           </div>
@@ -120,7 +117,11 @@ const handleLogin = async () => {
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+            :disabled="authStore.isLoading"
+            :class="[
+              'flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500',
+              { 'opacity-50 cursor-not-allowed': authStore.isLoading },
+            ]"
           >
             Sign in
           </button>
