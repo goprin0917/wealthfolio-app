@@ -9,10 +9,14 @@ import { HomeIcon, MenuIcon, UsersIcon, XIcon } from "lucide-vue-next";
 import SidebarLogo from "./SidebarLogo.vue";
 import SidebarNav from "./SidebarNav.vue";
 import NavUser from "./NavUser.vue";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 
 defineProps<{
   open: boolean;
 }>();
+
+const route = useRoute();
 
 const emit = defineEmits<{
   close: [];
@@ -27,6 +31,11 @@ const navigation = [
     icon: UsersIcon,
   },
 ];
+
+const currentPageName = computed(() => {
+  const currentItem = navigation.find((item) => item.to.name === route.name);
+  return currentItem?.name;
+});
 </script>
 
 <template>
@@ -119,15 +128,9 @@ const navigation = [
       <MenuIcon class="size-6" aria-hidden="true" />
     </button>
     <div class="flex-1 text-sm/6 font-semibold text-gray-900 dark:text-white">
-      Dashboard
+      {{ currentPageName }}
     </div>
-    <a href="#">
-      <span class="sr-only">Your profile</span>
-      <img
-        class="size-8 rounded-full bg-gray-50 outline -outline-offset-1 outline-black/5 dark:bg-gray-800 dark:outline-white/10"
-        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-        alt=""
-      />
-    </a>
+
+    <NavUser :is-mobile="true" />
   </div>
 </template>
