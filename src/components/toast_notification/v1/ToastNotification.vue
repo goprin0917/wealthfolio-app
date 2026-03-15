@@ -5,6 +5,7 @@ import {
   InfoIcon,
   TriangleAlertIcon,
   XCircleIcon,
+  XIcon,
 } from "lucide-vue-next";
 
 const { toasts, remove } = useToast();
